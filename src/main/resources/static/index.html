@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <header class="mb-4 text-center">
+        <h1 class="fw-semibold">Users API</h1>
+        <p class="text-muted">Sample users served from an in-memory store.</p>
+        <a class="btn btn-primary" href="/api/users" target="_blank" rel="noopener">View API JSON</a>
+    </header>
+
+    <section class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Current Users</h2>
+                <button id="reload" class="btn btn-outline-secondary btn-sm">Reload</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table" id="users-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Emoji</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Loading users...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p id="error" class="text-danger small mb-0" hidden></p>
+        </div>
+    </section>
+</div>
+
+<script>
+    const tableBody = document.querySelector('#users-table tbody');
+    const errorBox = document.getElementById('error');
+    const reloadButton = document.getElementById('reload');
+
+    async function loadUsers() {
+        tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Loading users...</td></tr>';
+        errorBox.hidden = true;
+
+        try {
+            const response = await fetch('/api/users');
+            if (!response.ok) {
+                throw new Error('Failed to load users');
+            }
+            const data = await response.json();
+
+            if (!Array.isArray(data) || data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No users found.</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = data.map(user => `
+                <tr>
+                    <td><code>${user.id}</code></td>
+                    <td>${user.name}</td>
+                    <td>${user.emoji ?? ''}</td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Unable to load users.</td></tr>';
+            errorBox.textContent = err.message;
+            errorBox.hidden = false;
+        }
+    }
+
+    reloadButton.addEventListener('click', loadUsers);
+    loadUsers();
+</script>
+</body>
+</html>

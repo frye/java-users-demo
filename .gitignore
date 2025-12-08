@@ -1,0 +1,22 @@
+target/
+
+# Build outputs
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# IDE metadata
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
