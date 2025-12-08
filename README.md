@@ -24,6 +24,19 @@ mvn spring-boot:run
 
 After startup, visit `http://localhost:8080/` for the web view. The REST API is available under `http://localhost:8080/api/users`.
 
+### Build a runnable JAR
+
+```bash
+mvn -DskipTests package
+java -jar target/users-demo-*.jar
+```
+
+If `mvn` is not found, install Maven or use a wrapper. On macOS:
+
+```bash
+brew install maven
+```
+
 ## API Overview
 
 | Method | Path | Description |
@@ -35,7 +48,29 @@ After startup, visit `http://localhost:8080/` for the web view. The REST API is 
 
 > ℹ️ Delete operations are intentionally omitted to match the reference behavior.
 
-### Sample payload
+### Data model
+
+User record fields:
+
+- `id` (`UUID`): generated if absent on create; path param controls on update
+- `name` (`String`): display name
+- `emoji` (`String`): Unicode emoji rendered in the UI
+
+### Request/response examples
+
+List users:
+
+```bash
+curl -s http://localhost:8080/api/users | jq
+```
+
+Get by ID:
+
+```bash
+curl -s http://localhost:8080/api/users/{uuid}
+```
+
+Create user:
 
 ```json
 {
@@ -44,13 +79,39 @@ After startup, visit `http://localhost:8080/` for the web view. The REST API is 
 }
 ```
 
+```bash
+curl -s -X POST http://localhost:8080/api/users \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"New Name","emoji":"\uD83D\uDE80"}'
+```
+
+Update user:
+
+```bash
+curl -s -X PUT http://localhost:8080/api/users/{uuid} \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Updated Name","emoji":"\u26A1\uFE0F"}'
+```
+
+Errors:
+
+- Missing user ID: HTTP `404 Not Found` with `ResponseStatusException` semantics
+- Invalid path ID format: HTTP `400 Bad Request` (from Spring path binding)
+
 ## Project Structure
 
 - `src/main/java`: Application source organized by feature package
 - `src/main/resources/static`: Static web assets
 - `pom.xml`: Maven build configuration
 
+## Troubleshooting
+
+- Port in use: set `server.port` via `SPRING_APPLICATION_JSON` or JVM prop: `-Dserver.port=8081`
+- Unicode display: the UI uses HTML; emojis are stored as strings and served as JSON
+- No tests: this starter intentionally omits automated tests; they can be added with `spring-boot-starter-test` upon request
+
 ## Next Steps
 
 - Extend the in-memory store with persistence if needed
 - Add authentication or authorization if required for your use case
+ - Add CI and tests (`spring-boot-starter-test`) if you want coverage

@@ -1,3 +1,12 @@
+/**
+ * REST API for user resources.
+ *
+ * Endpoints:
+ * - GET /api/users
+ * - GET /api/users/{id}
+ * - POST /api/users
+ * - PUT /api/users/{id}
+ */
 package com.example.usersdemo.web.api;
 
 import java.util.List;
@@ -28,23 +37,27 @@ public class UserRestController {
         this.userService = userService;
     }
 
+    /** List all users. */
     @GetMapping
     public List<User> listUsers() {
         return userService.findAll();
     }
 
+    /** Get a single user by id or return 404. */
     @GetMapping("/{id}")
     public User findUser(@PathVariable UUID id) {
         return userService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
+    /** Create a new user. */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody UserWriteModel input) {
         return userService.create(input);
     }
 
+    /** Update an existing user. */
     @PutMapping("/{id}")
     public User updateUser(@PathVariable UUID id, @RequestBody UserWriteModel input) {
         try {

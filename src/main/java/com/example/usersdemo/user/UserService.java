@@ -13,20 +13,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+/**
+ * In-memory user store with create and update operations.
+ *
+ * Backed by a synchronized {@link java.util.LinkedHashMap} seeded with demo users.
+ * Missing resources result in {@link com.example.usersdemo.user.UserNotFoundException}.
+ */
     private final Map<UUID, User> storage = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public UserService() {
         seed();
     }
 
+    /**
+     * Return all users in insertion order.
+     */
     public List<User> findAll() {
         return new ArrayList<>(storage.values());
     }
 
+    /**
+     * Find a user by id or throw if missing.
+     *
+     * @throws UserNotFoundException when no user exists with the given id
+     */
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(storage.get(id));
     }
 
+    /**
+     * Create a new user, generating defaults for absent fields.
+     */
     public User create(UserWriteModel input) {
         UUID id = input.id() != null ? input.id() : UUID.randomUUID();
         String name = input.name() != null ? input.name() : "Anonymous";
@@ -36,6 +53,9 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Update an existing user with provided fields; retains existing values when absent.
+     */
     public User update(UUID id, UserWriteModel input) {
         User existing = storage.get(id);
         if (existing == null) {

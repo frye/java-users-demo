@@ -1,3 +1,9 @@
+/**
+ * Spring Boot entry point for the Users Demo application.
+ *
+ * Exposes a minimal REST API and static web UI for managing
+ * in-memory demo users. See `README.md` for usage and endpoints.
+ */
 package com.example.usersdemo;
 
 import org.springframework.boot.SpringApplication;
