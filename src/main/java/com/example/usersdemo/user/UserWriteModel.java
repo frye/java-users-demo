@@ -8,5 +8,4 @@ import java.util.UUID;
  * Fields are optional to mirror lightweight API semantics.
  * Defaults are applied in {@link UserService} when absent.
  */
-	 public record UserWriteModel(Optional<UUID> id, Optional<String> name, Optional<String> emoji) {
-}
+public record UserWriteModel(String name, String emoji, UUID id) {}
